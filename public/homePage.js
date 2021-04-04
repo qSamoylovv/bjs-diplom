@@ -11,32 +11,36 @@ logoutButton.action = () => {
 };
 
 ApiConnector.current((profile) => {
-    if (profile.success === true) {
+    if (profile.success) {
         ProfileWidget.showProfile(profile.data);
     }
 });
 
 const ratesBoard = new RatesBoard();
 
-setInterval(
+const apiConnectorGetStocks = () => {
     ApiConnector.getStocks((value) => {
         // console.log(value);
-        if (value.success === true) {
+        if (value.success) {
             ratesBoard.clearTable();
             ratesBoard.fillTable(value.data);
         }
-    }),
-    60000
-);
+    });
+};
+
+apiConnectorGetStocks();
+setInterval(apiConnectorGetStocks(), 60000);
 
 const moneyManager = new MoneyManager();
 
 moneyManager.addMoneyCallback = (money) => {
     const pay = (moneyPayment) => {
         // console.log(moneyPayment);
-        if (moneyPayment.success === true) {
+        if (moneyPayment.success) {
             ProfileWidget.showProfile(moneyPayment.data);
             moneyManager.setMessage(moneyPayment.success, 'Баланс пополнен!');
+        } else {
+            moneyManager.setMessage(moneyPayment.success, moneyPayment.error);
         }
     };
 
@@ -45,12 +49,17 @@ moneyManager.addMoneyCallback = (money) => {
 
 moneyManager.conversionMoneyCallback = (money) => {
     const conversionMoney = (moneyConversion) => {
-        // console.log(moneyConversion);
-        if (moneyConversion.success === true) {
+        console.log(moneyConversion);
+        if (moneyConversion.success) {
             ProfileWidget.showProfile(moneyConversion.data);
             moneyManager.setMessage(
                 moneyConversion.success,
                 'Конвертация прошла успешно!'
+            );
+        } else {
+            moneyManager.setMessage(
+                moneyConversion.success,
+                moneyConversion.error
             );
         }
     };
@@ -61,12 +70,14 @@ moneyManager.conversionMoneyCallback = (money) => {
 moneyManager.sendMoneyCallback = (money) => {
     const sendMoneyTransaction = (moneyTransfer) => {
         // console.log(moneyTransfer);
-        if (moneyTransfer.success === true) {
+        if (moneyTransfer.success) {
             ProfileWidget.showProfile(moneyTransfer.data);
             moneyManager.setMessage(
                 moneyTransfer.success,
                 'Перевод выполнен успешно!'
             );
+        } else {
+            moneyManager.setMessage(moneyTransfer.success, moneyTransfer.error);
         }
     };
 
@@ -77,7 +88,7 @@ const favoritesWidget = new FavoritesWidget();
 
 ApiConnector.getFavorites((favoriteData) => {
     // console.log(favoriteData);
-    if (favoriteData.success === true) {
+    if (favoriteData.success) {
         favoritesWidget.clearTable();
         favoritesWidget.fillTable(favoriteData.data);
     }
@@ -88,13 +99,18 @@ ApiConnector.getFavorites((favoriteData) => {
 favoritesWidget.addUserCallback = (addUser) => {
     // console.log(addUser);
     const user = (userCallback) => {
-        if (userCallback.success === true) {
+        if (userCallback.success) {
             favoritesWidget.clearTable();
             favoritesWidget.fillTable(userCallback.data);
             moneyManager.updateUsersList(userCallback.data);
             favoritesWidget.setMessage(
                 userCallback.success,
                 'Пользователь успешно добавлен в избранное!'
+            );
+        } else {
+            favoritesWidget.setMessage(
+                userCallback.success,
+                userCallback.error
             );
         }
     };
@@ -105,13 +121,18 @@ favoritesWidget.addUserCallback = (addUser) => {
 favoritesWidget.removeUserCallback = (removeUser) => {
     // console.log(removeUser);
     const user = (userCallback) => {
-        if (userCallback.success === true) {
+        if (userCallback.success) {
             favoritesWidget.clearTable();
             favoritesWidget.fillTable(userCallback.data);
             moneyManager.updateUsersList(userCallback.data);
             favoritesWidget.setMessage(
                 userCallback.success,
                 'Пользователь успешно удален из избранного!'
+            );
+        } else {
+            favoritesWidget.setMessage(
+                userCallback.success,
+                userCallback.error
             );
         }
     };

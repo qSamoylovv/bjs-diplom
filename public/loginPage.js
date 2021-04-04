@@ -6,7 +6,7 @@ console.log(userForm);
 
 userForm.loginFormCallback = (data) => {
     const user = (response) => {
-        if (response.success === true) {
+        if (response.success) {
             location.reload();
         } else {
             userForm.setLoginErrorMessage(response.error);
@@ -18,7 +18,7 @@ userForm.loginFormCallback = (data) => {
 
 userForm.registerFormCallback = (data) => {
     const user = (response) => {
-        if (response.success === true) {
+        if (response.success) {
             location.reload();
         } else {
             userForm.setRegisterErrorMessage(response.error);
